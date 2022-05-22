@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.0.4",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.6.4",
     "web-vitals": "^2.1.4"
@@ -43,5 +44,12 @@
   "volta": {
     "node": "16.15.0",
     "npm": "8.10.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "@typescript-eslint/parser": "^5.25.0",
+    "eslint": "^8.16.0",
+    "eslint-plugin-react": "^7.30.0",
+    "prettier": "2.6.2"
   }
 }
