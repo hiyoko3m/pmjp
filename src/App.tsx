@@ -1,25 +1,16 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import { Title, Explanation } from "./components/common";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Title>
+        歴代総理大臣
+      </Title>
+      <Explanation>
+        {"「あの日の総理大臣って誰？」そんな疑問をすぐさま解決！"}
+      </Explanation>
+    </>
   );
 }
 
