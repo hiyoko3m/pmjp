@@ -6,11 +6,7 @@ type TitleProp = {
 };
 
 export function Title(props: TitleProp): JSX.Element {
-  return (
-    <Typography variant="h2">
-      {props.children}
-    </Typography>
-  );
+  return <Typography variant="h2">{props.children}</Typography>;
 }
 
 type ExplanationProp = {
@@ -18,9 +14,5 @@ type ExplanationProp = {
 };
 
 export function Explanation(props: ExplanationProp): JSX.Element {
-  return (
-    <Typography>
-      {props.children}
-    </Typography>
-  );
+  return <Typography>{props.children}</Typography>;
 }

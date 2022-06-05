@@ -32,7 +32,7 @@ export function firstDatePmJpExists(year: number, month: number): number {
   const firstMonth = firstMonthPmJpExists(year);
   assert(month >= firstMonth);
 
-  if (year == firstYear && month  == firstMonth) {
+  if (year == firstYear && month == firstMonth) {
     return 22;
   } else {
     return 1;
