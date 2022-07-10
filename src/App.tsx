@@ -5,14 +5,14 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import {
-  AdJpDate,
-  AdJpPartialDate,
+  AdDate,
+  AdPartialDate,
   AdJpDateFormProps,
   AdJpDateForm,
 } from "./components/date_form";
 
 function App() {
-  const [adDate, setAdDate] = React.useState<AdJpPartialDate>({
+  const [adDate, setAdDate] = React.useState<AdPartialDate>({
     adYear: undefined,
     adMonth: undefined,
     adDay: undefined,
@@ -39,7 +39,7 @@ function App() {
           spacing={2}
         >
           <AdJpDateForm
-            adJpDateValue={adDate}
+            adDateValue={adDate}
             onChange={(newDate) => setAdDate(newDate)}
           />
           <Button variant="contained" type="submit">
