@@ -18,7 +18,7 @@ export interface AdPartialDate {
 }
 
 export interface JpPartialDate {
-  jpEra?: string;
+  jpEra: string;
   jpYear?: number;
   jpMonth?: number;
   jpDay?: number;
@@ -55,13 +55,17 @@ const jpEras: { era: string; adDate: AdDate }[] = [
   { era: "令和", adDate: { adYear: 2019, adMonth: 5, adDay: 1 } },
 ];
 
+export function jpEraNames(): string[] {
+  return jpEras.filter((v) => v.era != "不明").map((v) => v.era);
+}
+
 export function AdToJpDate(adDate: AdPartialDate): JpPartialDate {
   if (
     adDate.adYear == undefined ||
     adDate.adMonth == undefined ||
     adDate.adDay == undefined
   ) {
-    return { jpMonth: adDate.adMonth, jpDay: adDate.adDay };
+    return { jpEra: "", jpMonth: adDate.adMonth, jpDay: adDate.adDay };
   }
   const adDateNonPartial = {
     adYear: adDate.adYear,
@@ -84,6 +88,36 @@ export function AdToJpDate(adDate: AdPartialDate): JpPartialDate {
     jpYear,
     jpMonth: adDateNonPartial.adMonth,
     jpDay: adDateNonPartial.adDay,
+  };
+}
+
+export function JpToAdDate(jpDate: JpPartialDate): AdPartialDate {
+  if (
+    jpDate.jpEra == undefined ||
+    jpDate.jpYear == undefined ||
+    jpDate.jpMonth == undefined ||
+    jpDate.jpDay == undefined
+  ) {
+    return { adMonth: jpDate.jpMonth, adDay: jpDate.jpDay };
+  }
+  const jpDateNonPartial = {
+    jpEra: jpDate.jpEra,
+    jpYear: jpDate.jpYear,
+    jpMonth: jpDate.jpMonth,
+    jpDay: jpDate.jpDay,
+  };
+
+  let adYearBegin: number = jpEras[0].adDate.adYear;
+  for (const eraBegin of jpEras) {
+    if (eraBegin.era === jpDateNonPartial.jpEra) {
+      adYearBegin = eraBegin.adDate.adYear;
+    }
+  }
+  const adYear = adYearBegin + jpDateNonPartial.jpYear - 1;
+  return {
+    adYear,
+    adMonth: jpDateNonPartial.jpMonth,
+    adDay: jpDateNonPartial.jpDay,
   };
 }
 

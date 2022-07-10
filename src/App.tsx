@@ -7,20 +7,50 @@ import CssBaseline from "@mui/material/CssBaseline";
 import {
   AdDate,
   AdPartialDate,
-  AdJpDateFormProps,
-  AdJpDateForm,
-} from "./components/date_form";
+  JpPartialDate,
+  AdToJpDate,
+  JpToAdDate,
+} from "./utils/date";
+import { AdJpDateForm } from "./components/date_form";
 
 function App() {
-  const [adDate, setAdDate] = React.useState<AdPartialDate>({
-    adYear: undefined,
-    adMonth: undefined,
-    adDay: undefined,
+  const [{ adDate, jpDate }, setAdAndJpDates] = React.useState<{
+    adDate: AdPartialDate;
+    jpDate: JpPartialDate;
+  }>({
+    adDate: {
+      adYear: undefined,
+      adMonth: undefined,
+      adDay: undefined,
+    },
+    jpDate: {
+      jpEra: "",
+      jpYear: undefined,
+      jpMonth: undefined,
+      jpDay: undefined,
+    },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("handleSubmit");
+  };
+
+  const handleChangeDate = ({
+    adArg: newAdDate = undefined,
+    jpArg: newJpDate = undefined,
+  }: {
+    adArg?: AdPartialDate;
+    jpArg?: JpPartialDate;
+  }) => {
+    if (newAdDate != undefined) {
+      console.log("bbb");
+      setAdAndJpDates({ adDate: newAdDate, jpDate: AdToJpDate(newAdDate) });
+    }
+    if (newJpDate != undefined) {
+      console.log("aaa");
+      setAdAndJpDates({ adDate: JpToAdDate(newJpDate), jpDate: newJpDate });
+    }
   };
 
   return (
@@ -40,7 +70,8 @@ function App() {
         >
           <AdJpDateForm
             adDateValue={adDate}
-            onChange={(newDate) => setAdDate(newDate)}
+            jpDateValue={jpDate}
+            onChange={handleChangeDate}
           />
           <Button variant="contained" type="submit">
             総理大臣を表示

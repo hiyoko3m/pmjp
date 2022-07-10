@@ -6,7 +6,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import {
@@ -16,19 +16,24 @@ import {
   firstYearPmJpExists,
   firstMonthPmJpExists,
   firstDayPmJpExists,
-  AdToJpDate,
   AdDate,
   AdPartialDate,
   JpDate,
   JpPartialDate,
+  jpEraNames,
 } from "../utils/date";
 import { range } from "../utils/range";
 
 interface AdJpDateFormProps {
   adDateValue: AdPartialDate;
-  onChange: (arg: AdPartialDate) => void;
-  choicableRangeBegin?: AdDate;
-  choicableRangeEnd?: AdDate;
+  jpDateValue: JpPartialDate;
+  onChange: ({
+    adArg,
+    jpArg,
+  }: {
+    adArg?: AdPartialDate;
+    jpArg?: JpPartialDate;
+  }) => void;
 }
 
 /**
@@ -37,22 +42,22 @@ interface AdJpDateFormProps {
 export function AdJpDateForm(props: AdJpDateFormProps) {
   const adDateCallback = React.useCallback(
     function (adDate: AdPartialDate) {
-      props.onChange(adDate);
+      props.onChange({ adArg: adDate });
     },
-    [props.adDateValue]
+    [props.adDateValue, props.jpDateValue]
   );
 
-  const jpDateValue = AdToJpDate(props.adDateValue);
+  const jpDateCallback = React.useCallback(
+    function (jpDate: JpPartialDate) {
+      props.onChange({ jpArg: jpDate });
+    },
+    [props.adDateValue, props.jpDateValue]
+  );
 
   return (
     <>
       <AdDateInput adDateValue={props.adDateValue} onChange={adDateCallback} />
-      <JpDateInput
-        jpDateValue={jpDateValue}
-        onChange={(arg) => {
-          console.log(arg);
-        }}
-      />
+      <JpDateInput jpDateValue={props.jpDateValue} onChange={jpDateCallback} />
       <FormControl>
         <RadioGroup row name="year-type-radio-buttons-group">
           <FormControlLabel
@@ -156,6 +161,13 @@ interface JpDateInputProps {
 }
 
 function JpDateInput(props: JpDateInputProps) {
+  const handleChangeEra = React.useCallback(
+    (event: SelectChangeEvent) => {
+      props.onChange({ ...props.jpDateValue, jpEra: event.target.value });
+    },
+    [props.jpDateValue]
+  );
+
   const handleChangeYear = React.useCallback(
     (_event: React.SyntheticEvent, value: string, _reason: string) => {
       props.onChange({ ...props.jpDateValue, jpYear: parseInt(value) });
@@ -181,8 +193,18 @@ function JpDateInput(props: JpDateInputProps) {
     <Stack direction="row" spacing={2}>
       <FormControl sx={{ minWidth: 120 }}>
         <InputLabel id="jp-era-label">年号</InputLabel>
-        <Select labelId="jp-era-label" id="jp-era" value={"令和"} label="年号">
-          <MenuItem value={"令和"}>aiueo</MenuItem>
+        <Select
+          labelId="jp-era-label"
+          id="jp-era"
+          value={props.jpDateValue.jpEra}
+          label="年号"
+          onChange={handleChangeEra}
+        >
+          {jpEraNames().map((era) => (
+            <MenuItem value={era} key={era}>
+              {era}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
       <Autocomplete
