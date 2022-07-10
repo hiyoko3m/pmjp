@@ -6,7 +6,23 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import {AdToJpDate, AdDate, AdPartialDate, JpDate, JpPartialDate} from "../utils/date";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import {
+  lastYear,
+  lastMonth,
+  lastDay,
+  firstYearPmJpExists,
+  firstMonthPmJpExists,
+  firstDayPmJpExists,
+  AdToJpDate,
+  AdDate,
+  AdPartialDate,
+  JpDate,
+  JpPartialDate,
+} from "../utils/date";
+import { range } from "../utils/range";
 
 interface AdJpDateFormProps {
   adDateValue: AdPartialDate;
@@ -19,14 +35,24 @@ interface AdJpDateFormProps {
  * can choose which to show A.D. or Japanese calendar via selector
  */
 export function AdJpDateForm(props: AdJpDateFormProps) {
-  const adDateCallback = React.useCallback(function (adDate: AdPartialDate) { props.onChange(adDate) }, [props.adDateValue]);
+  const adDateCallback = React.useCallback(
+    function (adDate: AdPartialDate) {
+      props.onChange(adDate);
+    },
+    [props.adDateValue]
+  );
 
   const jpDateValue = AdToJpDate(props.adDateValue);
 
   return (
     <>
-      <AdDateInput adDateValue={props.adDateValue} onChange={adDateCallback}/>
-      <JpDateInput jpDateValue={jpDateValue} onChange={(arg) => {console.log(arg)}}/>
+      <AdDateInput adDateValue={props.adDateValue} onChange={adDateCallback} />
+      <JpDateInput
+        jpDateValue={jpDateValue}
+        onChange={(arg) => {
+          console.log(arg);
+        }}
+      />
       <FormControl>
         <RadioGroup row name="year-type-radio-buttons-group">
           <FormControlLabel
@@ -62,7 +88,8 @@ function AdDateInput(props: AdDateInputProps) {
   const handleChangeYear = React.useCallback(
     (_event: React.SyntheticEvent, value: string, _reason: string) => {
       props.onChange({ ...props.adDateValue, adYear: parseInt(value) });
-    }, [props.adDateValue]
+    },
+    [props.adDateValue]
   );
 
   const handleChangeMonth = React.useCallback(
@@ -78,41 +105,49 @@ function AdDateInput(props: AdDateInputProps) {
     },
     [props.adDateValue]
   );
-  
+
   return (
-      <Stack direction="row" spacing={2}>
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="ad-year"
-          options={["2000"]}
-          renderInput={(params) => <TextField {...params} label="年" />}
-          sx={{ width: "110px" }}
-          onInputChange={handleChangeYear}
-          inputValue={converter(props.adDateValue.adYear)}
-        />
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="ad-month"
-          options={["1"]}
-          renderInput={(params) => <TextField {...params} label="月" />}
-          sx={{ width: "80px" }}
-          onInputChange={handleChangeMonth}
-          inputValue={converter(props.adDateValue.adMonth)}
-        />
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="ad-day"
-          options={["1"]}
-          renderInput={(params) => <TextField {...params} label="日" />}
-          sx={{ width: "80px" }}
-          onInputChange={handleChangeDay}
-          inputValue={converter(props.adDateValue.adDay)}
-        />
-      </Stack>
-    );
+    <Stack direction="row" spacing={2}>
+      <Autocomplete
+        disablePortal
+        id="ad-year"
+        options={range(firstYearPmJpExists(), lastYear() + 1).map((v) =>
+          v.toString()
+        )}
+        renderInput={(params) => <TextField {...params} label="年" />}
+        sx={{ width: "130px" }}
+        onInputChange={handleChangeYear}
+        inputValue={converter(props.adDateValue.adYear)}
+      />
+      <Autocomplete
+        disablePortal
+        id="ad-month"
+        options={range(
+          firstMonthPmJpExists(props.adDateValue.adYear),
+          lastMonth(props.adDateValue.adYear) + 1
+        ).map((v) => v.toString())}
+        renderInput={(params) => <TextField {...params} label="月" />}
+        sx={{ width: "100px" }}
+        onInputChange={handleChangeMonth}
+        inputValue={converter(props.adDateValue.adMonth)}
+      />
+      <Autocomplete
+        disablePortal
+        id="ad-day"
+        options={range(
+          firstDayPmJpExists(
+            props.adDateValue.adYear,
+            props.adDateValue.adMonth
+          ),
+          lastDay(props.adDateValue.adYear, props.adDateValue.adMonth) + 1
+        ).map((v) => v.toString())}
+        renderInput={(params) => <TextField {...params} label="日" />}
+        sx={{ width: "100px" }}
+        onInputChange={handleChangeDay}
+        inputValue={converter(props.adDateValue.adDay)}
+      />
+    </Stack>
+  );
 }
 
 interface JpDateInputProps {
@@ -124,7 +159,8 @@ function JpDateInput(props: JpDateInputProps) {
   const handleChangeYear = React.useCallback(
     (_event: React.SyntheticEvent, value: string, _reason: string) => {
       props.onChange({ ...props.jpDateValue, jpYear: parseInt(value) });
-    }, [props.jpDateValue]
+    },
+    [props.jpDateValue]
   );
 
   const handleChangeMonth = React.useCallback(
@@ -140,42 +176,47 @@ function JpDateInput(props: JpDateInputProps) {
     },
     [props.jpDateValue]
   );
-  
-  return (
-      <Stack direction="row" spacing={2}>
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="jp-year"
-          options={["2000"]}
-          renderInput={(params) => <TextField {...params} label="年" />}
-          sx={{ width: "110px" }}
-          onInputChange={handleChangeYear}
-          inputValue={converter(props.jpDateValue.jpYear)}
-        />
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="jp-month"
-          options={["1"]}
-          renderInput={(params) => <TextField {...params} label="月" />}
-          sx={{ width: "80px" }}
-          onInputChange={handleChangeMonth}
-          inputValue={converter(props.jpDateValue.jpMonth)}
-        />
-        <Autocomplete
-          disablePortal
-          freeSolo
-          id="jp-day"
-          options={["1"]}
-          renderInput={(params) => <TextField {...params} label="日" />}
-          sx={{ width: "80px" }}
-          onInputChange={handleChangeDay}
-          inputValue={converter(props.jpDateValue.jpDay)}
-        />
-      </Stack>
-    );
-}
 
+  return (
+    <Stack direction="row" spacing={2}>
+      <FormControl sx={{ minWidth: 120 }}>
+        <InputLabel id="jp-era-label">年号</InputLabel>
+        <Select labelId="jp-era-label" id="jp-era" value={"令和"} label="年号">
+          <MenuItem value={"令和"}>aiueo</MenuItem>
+        </Select>
+      </FormControl>
+      <Autocomplete
+        disablePortal
+        freeSolo
+        id="jp-year"
+        options={["2000"]}
+        renderInput={(params) => <TextField {...params} label="年" />}
+        sx={{ width: "110px" }}
+        onInputChange={handleChangeYear}
+        inputValue={converter(props.jpDateValue.jpYear)}
+      />
+      <Autocomplete
+        disablePortal
+        freeSolo
+        id="jp-month"
+        options={["1"]}
+        renderInput={(params) => <TextField {...params} label="月" />}
+        sx={{ width: "80px" }}
+        onInputChange={handleChangeMonth}
+        inputValue={converter(props.jpDateValue.jpMonth)}
+      />
+      <Autocomplete
+        disablePortal
+        freeSolo
+        id="jp-day"
+        options={["1"]}
+        renderInput={(params) => <TextField {...params} label="日" />}
+        sx={{ width: "80px" }}
+        onInputChange={handleChangeDay}
+        inputValue={converter(props.jpDateValue.jpDay)}
+      />
+    </Stack>
+  );
+}
 
 export type { AdDate, AdPartialDate, AdJpDateFormProps };

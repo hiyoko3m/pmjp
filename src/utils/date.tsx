@@ -1,5 +1,3 @@
-//import assert from "assert";
-
 export interface AdDate {
   adYear: number;
   adMonth: number;
@@ -31,29 +29,45 @@ function compareAdDates(x: AdDate, y: AdDate): number {
     return -1;
   } else if (x.adYear == y.adYear && x.adMonth < y.adMonth) {
     return -1;
-  } else if (x.adYear == y.adYear && x.adMonth == y.adMonth && x.adDay < y.adDay) {
+  } else if (
+    x.adYear == y.adYear &&
+    x.adMonth == y.adMonth &&
+    x.adDay < y.adDay
+  ) {
     return -1;
-  } else if (x.adYear == y.adYear && x.adMonth == y.adMonth && x.adDay == y.adDay) {
+  } else if (
+    x.adYear == y.adYear &&
+    x.adMonth == y.adMonth &&
+    x.adDay == y.adDay
+  ) {
     return 0;
   } else {
     return 1;
   }
 }
 
-const jpEras: {era: string; adDate: AdDate; }[] = [
-  {era: "不明", adDate: {adYear: 1, adMonth: 1, adDay: 1}},
-  {era: "明治", adDate: {adYear: 1868, adMonth: 1, adDay: 1}},
-  {era: "大正", adDate: {adYear: 1912, adMonth: 7, adDay: 30}},
-  {era: "昭和", adDate: {adYear: 1926, adMonth: 12, adDay: 25}},
-  {era: "平成", adDate: {adYear: 1989, adMonth: 1, adDay: 8}},
-  {era: "令和", adDate: {adYear: 2019, adMonth: 5, adDay: 1}}
+const jpEras: { era: string; adDate: AdDate }[] = [
+  { era: "不明", adDate: { adYear: 1, adMonth: 1, adDay: 1 } },
+  { era: "明治", adDate: { adYear: 1868, adMonth: 1, adDay: 1 } },
+  { era: "大正", adDate: { adYear: 1912, adMonth: 7, adDay: 30 } },
+  { era: "昭和", adDate: { adYear: 1926, adMonth: 12, adDay: 25 } },
+  { era: "平成", adDate: { adYear: 1989, adMonth: 1, adDay: 8 } },
+  { era: "令和", adDate: { adYear: 2019, adMonth: 5, adDay: 1 } },
 ];
 
 export function AdToJpDate(adDate: AdPartialDate): JpPartialDate {
-  if (adDate.adYear == undefined || adDate.adMonth == undefined || adDate.adDay == undefined) {
-    return {jpMonth: adDate.adMonth, jpDay: adDate.adDay};
+  if (
+    adDate.adYear == undefined ||
+    adDate.adMonth == undefined ||
+    adDate.adDay == undefined
+  ) {
+    return { jpMonth: adDate.adMonth, jpDay: adDate.adDay };
   }
-  const adDateNonPartial = {adYear: adDate.adYear, adMonth: adDate.adMonth, adDay: adDate.adDay };
+  const adDateNonPartial = {
+    adYear: adDate.adYear,
+    adMonth: adDate.adMonth,
+    adDay: adDate.adDay,
+  };
 
   let era: string = jpEras[0].era;
   let adDateBegin: AdDate = jpEras[0].adDate;
@@ -65,9 +79,13 @@ export function AdToJpDate(adDate: AdPartialDate): JpPartialDate {
     adDateBegin = eraBegin.adDate;
   }
   const jpYear = adDateNonPartial.adYear - adDateBegin.adYear + 1;
-  return {jpEra: era, jpYear, jpMonth: adDateNonPartial.adMonth, jpDay: adDateNonPartial.adDay};
+  return {
+    jpEra: era,
+    jpYear,
+    jpMonth: adDateNonPartial.adMonth,
+    jpDay: adDateNonPartial.adDay,
+  };
 }
-
 
 /**
  * The first date when the prime minister exist in Japan
@@ -78,36 +96,74 @@ export function firstYearPmJpExists(): number {
 }
 
 /**
+ * Today's year
+ */
+export function lastYear(): number {
+  return new Date().getFullYear();
+}
+
+/**
  * Assumption: year >= firstYearPmJpExists()
  */
-export function firstMonthPmJpExists(year: number): number {
+export function firstMonthPmJpExists(year?: number): number {
   const firstYear = firstYearPmJpExists();
-  //assert(year >= firstYear);
 
-  if (year == firstYear) {
+  if (year == undefined || year != firstYear) {
+    return 1;
+  } else {
+    return 12;
+  }
+}
+
+export function lastMonth(year?: number): number {
+  const lastY = lastYear();
+
+  if (year == undefined || year != lastY) {
     return 12;
   } else {
-    return 1;
+    return new Date().getMonth();
   }
 }
 
 /**
  * Assumption: (year, month) >= (firstYearPmJpExists(), firstYearPmJpExists(year))
  */
-export function firstDatePmJpExists(year: number, month: number): number {
+export function firstDayPmJpExists(year?: number, month?: number): number {
   const firstYear = firstYearPmJpExists();
-  //assert(year >= firstYear);
-
   const firstMonth = firstMonthPmJpExists(year);
-  //assert(month >= firstMonth);
 
-  if (year == firstYear && month == firstMonth) {
-    return 22;
-  } else {
+  if (
+    year == undefined ||
+    month == undefined ||
+    !(year == firstYear && month == firstMonth)
+  ) {
     return 1;
+  } else {
+    return 22;
   }
 }
 
-export function lastDate(year: number, month: number): number {
-  return 30;
+export function lastDay(year?: number, month?: number): number {
+  const lastY = lastYear();
+  const lastM = lastMonth(year);
+
+  if (year == undefined || month == undefined) {
+    return 31;
+  } else if (year == lastY && month == lastM) {
+    return new Date().getDate();
+  } else {
+    if (month == 4 || month == 6 || month == 9 || month == 11) {
+      return 30;
+    } else if (month == 2) {
+      if (year % 100 == 0 && year % 400 != 0) {
+        return 28;
+      } else if (year % 4 == 0) {
+        return 29;
+      } else {
+        return 28;
+      }
+    } else {
+      return 31;
+    }
+  }
 }
